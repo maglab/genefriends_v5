@@ -1,0 +1,57 @@
+version: '3.8'
+services: 
+    neo4j:
+        image: neo4j:4.3.2-enterprise
+        restart: unless-stopped
+        ports: 
+            -   7474:7474
+            -   7687:7687
+        environment: 
+            -   NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+            -   NEO4JLABS_PLUGINS=["graph-data-science", "apoc"]
+            -   NEO4J_dbms_security_procedures_whitelist=gds.*,apoc.*
+            -   NEO4J_dbms_security_procedures_unrestricted=gds.*,apoc.*
+            -   NEO4J_dbms_security_procedures_allowlist=gds.*,apoc.*
+            -   NEO4J_apoc_import_file_use__neo4j__config=true
+            -   NEO4J_apoc_import_file_enabled=true
+            -   NEO4J_apoc_export_file_enabled=true
+#            -   NEO4J_dbms_directories_import=import
+        volumes: 
+            -   /root/neo4jv/data:/data
+            -   neo4jv:/logs
+#            -   neo4jv:/var/lib/neo4j/import
+            -   neo4jv:/plugins
+            - ./neo4j/import:/var/lib/neo4j/import
+#           -   ./neo4j/conf:/var/lib/neo4j/conf
+        networks: 
+            -   genefriends
+    backend:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        restart: unless-stopped
+        depends_on: 
+            -   neo4j
+        environment: 
+            -   PORT=3000
+            -   PASSWORD=
+            -   DATABASEUSER=neo4j
+            -   DATABASEPASSWORD=
+            -   DATABASEURL=bolt://neo4j:7687
+        ports:
+            -   3000:3000
+        networks: 
+            -   genefriends
+    frontend:
+        build:
+            context: ./frontend
+            dockerfile: Dockerfile
+        restart: always
+        ports:
+            -   5000:3000
+        networks: 
+            -   genefriends
+volumes: 
+    neo4jv:
+networks:
+    genefriends:

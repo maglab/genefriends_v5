@@ -1,0 +1,10 @@
+version: '3.8'
+services: 
+    certbot:
+        depends_on: 
+            -   nginx
+        image: certbot/certbot
+        command: certonly --webroot --webroot-path=/var/www/certbot --email rodrigo.guinea@liverpool.ac.uk --agree-tos --no-eff-email -d genefriends.org
+        volumes: 
+            -   /root/certbot/conf:/etc/letsencrypt
+            -   /root/certbot/www:/var/www/certbot

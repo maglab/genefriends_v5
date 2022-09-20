@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  david:
+    build:
+      context: ./david
+      dockerfile: Dockerfile
+    ports:
+      - 9000:9000
